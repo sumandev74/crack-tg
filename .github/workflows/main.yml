@@ -10,5 +10,16 @@ jobs:
             11,12,13,14,15]
     steps:
     - uses: actions/checkout@v3
+    - name: Setup Cloudflare WARP
+      run: |
+        curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | sudo gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ jammy main" | sudo tee /etc/apt/sources.list.d/cloudflare-client.list
+        sudo apt-get update
+        sudo apt-get install cloudflare-warp -y
+        warp-cli --accept-tos registration new
+        warp-cli --accept-tos mode warp
+        warp-cli --accept-tos connect
+        sleep 5
+        curl ifconfig.me
     - run: chmod +x soul
-    - run: sudo ./soul 91.108.17.37 32002 120 999
+    - run: sudo ./soul 91.108.17.54 32002 120 999
